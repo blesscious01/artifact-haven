@@ -6,57 +6,52 @@ interface ProductProps {
   id: string;
   name: string;
   brand: string;
-  price: string;
+  price: number;      // Harga IDR
+  pricePhp?: number;  // Harga PHP (Opsional)
   condition: string;
   imageUrl: string;
-  status: string; // <-- Tambah ini
+  status: string;
 }
 
-export default function ProductCard({ id, name, brand, price, condition, imageUrl, status }: ProductProps) {
-  const isSold = status === 'Sold Out';
-
+export default function ProductCard({ id, name, brand, price, pricePhp, condition, imageUrl, status }: ProductProps) {
   return (
-    <Link href={`/products/${id}`} className={`group cursor-pointer block ${isSold ? 'opacity-75' : ''}`}>
-      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative">
-        
-        {/* STEMPEL SOLD OUT */}
-        {isSold && (
-          <div className="absolute top-4 right-4 z-20 bg-red-600 text-white text-xs font-black px-3 py-1 rounded shadow-lg transform rotate-12 border-2 border-white">
-            SOLD OUT
+    <Link href={`/products/${id}`} className="group block">
+      <div className="relative aspect-[4/5] bg-gray-100 rounded-2xl overflow-hidden mb-4">
+        {status !== 'Available' && (
+          <div className="absolute top-3 right-3 bg-black/70 text-white text-xs font-bold px-3 py-1 rounded-full z-10 backdrop-blur-md">
+            {status}
           </div>
         )}
+        
+        <Image 
+          src={imageUrl} 
+          alt={name}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+        />
+      </div>
 
-        {/* Gambar */}
-        <div className="relative h-64 w-full bg-gray-50">
-          <Image 
-            src={imageUrl} 
-            alt={name} 
-            fill 
-            className={`object-contain p-4 transition-transform duration-500 ${isSold ? 'grayscale' : 'group-hover:scale-110'}`}
-          />
-          <div className="absolute top-3 left-3">
-            <span className="bg-black/80 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-widest">
-              {condition}
+      <div className="space-y-1">
+        <p className="text-xs text-gray-500 font-bold uppercase tracking-wider">{brand}</p>
+        <h3 className="font-bold text-lg leading-tight group-hover:text-cyan-600 transition-colors line-clamp-1">{name}</h3>
+        
+        {/* TAMPILAN DUAL CURRENCY */}
+        <div className="flex flex-col">
+          <span className="text-black font-black">
+            Rp {price.toLocaleString('id-ID')}
+          </span>
+          {/* Kalau ada harga PHP, tampilkan di bawahnya */}
+          {pricePhp && (
+            <span className="text-xs text-gray-500 font-medium">
+              ₱ {pricePhp.toLocaleString('en-PH')}
             </span>
-          </div>
+          )}
         </div>
 
-        {/* Info */}
-        <div className="p-5">
-          <p className="text-xs text-gray-400 font-bold uppercase tracking-tighter mb-1">{brand}</p>
-          <h3 className="text-lg font-black text-gray-900 leading-tight mb-2 group-hover:text-cyan-600 transition-colors">
-            {name}
-          </h3>
-          <div className="flex justify-between items-center">
-            <span className={`text-xl font-black ${isSold ? 'text-gray-400 line-through' : 'text-gray-900'}`}>
-              {price}
-            </span>
-            {!isSold && (
-              <span className="text-[10px] font-bold text-cyan-600 border border-cyan-600 px-2 py-1 rounded hover:bg-cyan-600 hover:text-white transition-all">
-                VIEW DETAIL
-              </span>
-            )}
-          </div>
+        <div className="flex gap-2 mt-2">
+           <span className="text-[10px] border border-gray-200 px-2 py-1 rounded-md text-gray-600">
+             {condition}
+           </span>
         </div>
       </div>
     </Link>

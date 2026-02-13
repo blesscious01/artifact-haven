@@ -1,3 +1,4 @@
+import Link from 'next/link'; // <--- Wajib di-import
 import Image from 'next/image';
 
 export default function Hero() {
@@ -16,13 +17,23 @@ export default function Hero() {
             Artifact Haven is your sanctuary for authentic, factory-sealed masterpieces. 
             Directly sourced and curated for collectors in the Philippines & Indonesia.
           </p>
+          
           <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-            <button className="px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-cyan-500 transition-all shadow-xl">
+            {/* TOMBOL 1: Mengarah ke daftar koleksi (#collection) */}
+            <Link 
+              href="/#collection"
+              className="px-8 py-4 bg-gray-900 text-white font-bold rounded-full hover:bg-cyan-500 transition-all shadow-xl flex items-center justify-center"
+            >
               Shop New Arrivals
-            </button>
-            <button className="px-8 py-4 border-2 border-gray-200 text-gray-900 font-bold rounded-full hover:border-pink-400 transition-all">
+            </Link>
+
+            {/* TOMBOL 2: Mengarah ke form request (#request) */}
+            <Link 
+              href="/#request"
+              className="px-8 py-4 border-2 border-gray-200 text-gray-900 font-bold rounded-full hover:border-pink-400 transition-all flex items-center justify-center"
+            >
               Request a Figure
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -32,7 +43,7 @@ export default function Hero() {
              {/* Logo kamu sebagai elemen hero */}
             <Image 
               src="/logo.png" 
-              alt="logo"
+              alt="Artifact Haven Logo"
               fill
               className="object-contain drop-shadow-[0_0_30px_rgba(34,211,238,0.3)]"
             />
