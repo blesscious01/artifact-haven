@@ -1,101 +1,137 @@
 'use client';
+
 import { useState } from 'react';
 import { supabase } from '@/app/lib/supabase';
+import { Send, Loader2, CheckCircle } from 'lucide-react';
 
 export default function RequestForm() {
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: '',
-    contact: '',
-    figure: '',
-    budget: '',
-    currency: 'IDR' // Default currency
+    contact: '', // Email or WA
+    item_name: '',
+    series: '',
+    notes: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    const { error } = await supabase.from('scouting_requests').insert([
-      {
-        name: formData.name,
-        contact_info: formData.contact,
-        figure_name: formData.figure,
-        budget: formData.budget,
-        currency: formData.currency // Kirim data mata uang
-      }
-    ]);
+    const { error } = await supabase
+      .from('requests')
+      .insert([
+        {
+          name: formData.name,
+          contact: formData.contact,
+          item_name: formData.item_name, // Pastikan ini match dengan database
+          series: formData.series,
+          notes: formData.notes,
+          status: 'Pending'
+        }
+      ]);
 
     if (error) {
-      alert('Error: ' + error.message);
+      // TAMPILKAN PESAN ERROR ASLI DARI SUPABASE
+      alert(`Gagal kirim: ${error.message || error.details || JSON.stringify(error)}`);
+      console.error("Supabase Error Detail:", error); 
     } else {
-      alert('Request sent! We will find it for you.');
-      setFormData({ name: '', contact: '', figure: '', budget: '', currency: 'IDR' });
+      setSuccess(true);
+      setFormData({ name: '', contact: '', item_name: '', series: '', notes: '' });
+      setTimeout(() => setSuccess(false), 5000);
     }
     setLoading(false);
   };
 
   return (
-    <section id="request" className="bg-gray-900 py-20 px-6 mt-20 rounded-[3rem] mx-4 overflow-hidden relative mb-20">
-      <div className="container mx-auto max-w-4xl relative z-10">
+    <section className="py-20 bg-black text-white">
+      <div className="container mx-auto px-6 max-w-4xl">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-black text-white mb-4">CAN'T FIND YOUR ARTIFACT?</h2>
-          <p className="text-gray-400">Let us scout the Japan & PH markets for you.</p>
+          <span className="text-cyan-400 font-bold tracking-widest text-xs uppercase mb-2 block">Can't find what you're looking for?</span>
+          <h2 className="text-4xl font-black tracking-tighter">REQUEST AN ARTIFACT</h2>
+          <p className="text-gray-400 mt-4">We act as your personal hunter in Japan. Tell us what you need.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white/5 p-8 rounded-3xl backdrop-blur-sm border border-white/10">
-          <input 
-            required
-            type="text" 
-            placeholder="Your Name" 
-            className="bg-white/10 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-cyan-500"
-            value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
-          />
-          <input 
-            required
-            type="text" 
-            placeholder="Contact (WA / Messenger)" 
-            className="bg-white/10 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-cyan-500"
-            value={formData.contact}
-            onChange={(e) => setFormData({...formData, contact: e.target.value})}
-          />
-          <input 
-            required
-            type="text" 
-            placeholder="Figure Name / Series" 
-            className="bg-white/10 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-cyan-500 md:col-span-2"
-            value={formData.figure}
-            onChange={(e) => setFormData({...formData, figure: e.target.value})}
-          />
-          
-          {/* INPUT BUDGET DENGAN PILIHAN MATA UANG */}
-          <div className="md:col-span-2 flex gap-2">
-            <select 
-              className="bg-white/10 border border-white/10 p-4 rounded-xl text-white outline-none focus:border-cyan-500 font-bold w-24"
-              value={formData.currency}
-              onChange={(e) => setFormData({...formData, currency: e.target.value})}
-            >
-              <option value="IDR" className="text-black">IDR</option>
-              <option value="PHP" className="text-black">PHP</option>
-            </select>
-            <input 
-              type="text" 
-              placeholder="Estimated Budget (Optional)" 
-              className="bg-white/10 border border-white/10 p-4 rounded-xl text-white w-full outline-none focus:border-cyan-500"
-              value={formData.budget}
-              onChange={(e) => setFormData({...formData, budget: e.target.value})}
-            />
+        {success ? (
+          <div className="bg-green-900/50 border border-green-500 p-8 rounded-2xl text-center animate-pulse">
+            <CheckCircle className="mx-auto h-12 w-12 text-green-400 mb-4" />
+            <h3 className="text-2xl font-bold text-green-400">Request Received!</h3>
+            <p className="text-gray-300">We will hunt for this item and contact you shortly.</p>
           </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="bg-white/5 p-8 md:p-12 rounded-3xl border border-white/10 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase">Your Name</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-black border border-gray-700 rounded-xl p-4 text-white focus:border-cyan-500 outline-none transition-colors"
+                  placeholder="Collector Name"
+                  value={formData.name}
+                  onChange={e => setFormData({...formData, name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase">Contact (WA / Email)</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-black border border-gray-700 rounded-xl p-4 text-white focus:border-cyan-500 outline-none transition-colors"
+                  placeholder="+62... or email@..."
+                  value={formData.contact}
+                  onChange={e => setFormData({...formData, contact: e.target.value})}
+                />
+              </div>
+            </div>
 
-          <button 
-            type="submit" 
-            disabled={loading}
-            className="md:col-span-2 bg-cyan-600 hover:bg-cyan-500 text-white font-black py-5 rounded-xl transition-all uppercase tracking-widest disabled:bg-gray-700"
-          >
-            {loading ? 'SENDING...' : 'ACTIVATE SCOUTING'}
-          </button>
-        </form>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase">Item Name / Character</label>
+                <input 
+                  required
+                  type="text" 
+                  className="w-full bg-black border border-gray-700 rounded-xl p-4 text-white focus:border-cyan-500 outline-none transition-colors"
+                  placeholder="e.g. Nendoroid Mikasa Ackerman"
+                  value={formData.item_name}
+                  onChange={e => setFormData({...formData, item_name: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-400 mb-2 uppercase">Series (Optional)</label>
+                <input 
+                  type="text" 
+                  className="w-full bg-black border border-gray-700 rounded-xl p-4 text-white focus:border-cyan-500 outline-none transition-colors"
+                  placeholder="e.g. Attack on Titan"
+                  value={formData.series}
+                  onChange={e => setFormData({...formData, series: e.target.value})}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-gray-400 mb-2 uppercase">Additional Notes (Budget, Condition, etc.)</label>
+              <textarea 
+                rows={3}
+                className="w-full bg-black border border-gray-700 rounded-xl p-4 text-white focus:border-cyan-500 outline-none transition-colors"
+                placeholder="I prefer MISB condition, budget around IDR 800k..."
+                value={formData.notes}
+                onChange={e => setFormData({...formData, notes: e.target.value})}
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={loading}
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-black font-black py-4 rounded-xl text-lg transition-all flex items-center justify-center gap-2"
+            >
+              {loading ? <Loader2 className="animate-spin" /> : <Send size={20} />}
+              {loading ? 'SENDING...' : 'SEND REQUEST'}
+            </button>
+          </form>
+        )}
       </div>
     </section>
   );

@@ -5,34 +5,31 @@ import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
 import RequestForm from './components/RequestForm';
 
-export const revalidate = 0;
+export const revalidate = 0; // Biar data selalu fresh tiap refresh
 
 export default async function Home() {
-  // 1. QUERY NEW ARRIVALS (Ambil 3 paling baru)
+  // 1. QUERY NEW ARRIVALS
   const { data: newArrivals } = await supabase
     .from('products')
     .select('*')
-    .neq('status', 'Hidden')
+    .neq('status', 'Hidden') // Jangan tampilkan yang Hidden
     .order('created_at', { ascending: false })
     .limit(3);
 
-  // 2. QUERY FEATURED (Ambil produk yang ditandai is_featured = true)
+  // 2. QUERY FEATURED
   const { data: featuredProducts } = await supabase
     .from('products')
     .select('*')
     .neq('status', 'Hidden')
-    .eq('is_featured', true) // Hanya yang dicentang featured
+    .eq('is_featured', true)
     .limit(8);
 
   return (
     <main className="min-h-screen bg-white">
       <Header />
-      
-      {/* ⚠️ INI DIA HERO SECTION NYA (Tetap Ada) */}
       <Hero />
 
       {/* --- SECTION 1: NEW ARRIVALS --- */}
-      {/* SAYA UBAH ID JADI "collection" BIAR TOMBOL HERO BISA SCROLL KESINI */}
       <section id="collection" className="container mx-auto px-6 py-16 scroll-mt-24">
         <div className="flex justify-between items-end mb-8">
           <div>
@@ -47,12 +44,14 @@ export default async function Home() {
               key={product.id}
               id={product.id}
               name={product.name}
+              series={product.series} // 🔥 PENTING: Pass Series Data
               brand={product.brand || 'Unknown'} 
               price={product.price}
               pricePhp={product.price_php} // Pass harga PHP
               condition={product.condition}
-              imageUrl={product.image_url || '/logo.png'}
+              imageUrl={product.image_url || '/logo.png'} // Fallback kalau gak ada gambar
               status={product.status}
+              is_negotiable={product.is_negotiable} // Pass status Nego
             />
           ))}
         </div>
@@ -81,12 +80,14 @@ export default async function Home() {
                   key={product.id}
                   id={product.id}
                   name={product.name}
+                  series={product.series} // 🔥 PENTING
                   brand={product.brand || 'Unknown'} 
                   price={product.price}
                   pricePhp={product.price_php}
                   condition={product.condition}
                   imageUrl={product.image_url || '/logo.png'}
                   status={product.status}
+                  is_negotiable={product.is_negotiable}
                 />
               ))}
             </div>
