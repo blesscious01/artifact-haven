@@ -5,14 +5,14 @@ import Hero from './components/Hero';
 import ProductCard from './components/ProductCard';
 import RequestForm from './components/RequestForm';
 
-export const revalidate = 0; // Biar data selalu fresh tiap refresh
+export const revalidate = 0; // Data selalu fresh
 
 export default async function Home() {
   // 1. QUERY NEW ARRIVALS
   const { data: newArrivals } = await supabase
     .from('products')
     .select('*')
-    .neq('status', 'Hidden') // Jangan tampilkan yang Hidden
+    .neq('status', 'Hidden')
     .order('created_at', { ascending: false })
     .limit(3);
 
@@ -24,10 +24,21 @@ export default async function Home() {
     .eq('is_featured', true)
     .limit(8);
 
+  // 3. QUERY WEBSITE CONTENT (HERO TEXT) 🔥
+  const { data: content } = await supabase
+    .from('website_content')
+    .select('*')
+    .single();
+
   return (
     <main className="min-h-screen bg-white">
       <Header />
-      <Hero />
+      
+      {/* Oper data dari database ke Hero Component */}
+      <Hero 
+        title={content?.hero_title} 
+        subtitle={content?.hero_subtitle} 
+      />
 
       {/* --- SECTION 1: NEW ARRIVALS --- */}
       <section id="collection" className="container mx-auto px-6 py-16 scroll-mt-24">
@@ -44,14 +55,14 @@ export default async function Home() {
               key={product.id}
               id={product.id}
               name={product.name}
-              series={product.series} // 🔥 PENTING: Pass Series Data
+              series={product.series}
               brand={product.brand || 'Unknown'} 
               price={product.price}
-              pricePhp={product.price_php} // Pass harga PHP
+              pricePhp={product.price_php}
               condition={product.condition}
-              imageUrl={product.image_url || '/logo.png'} // Fallback kalau gak ada gambar
+              imageUrl={product.image_url || '/logo.png'}
               status={product.status}
-              is_negotiable={product.is_negotiable} // Pass status Nego
+              is_negotiable={product.is_negotiable}
             />
           ))}
         </div>
@@ -80,7 +91,7 @@ export default async function Home() {
                   key={product.id}
                   id={product.id}
                   name={product.name}
-                  series={product.series} // 🔥 PENTING
+                  series={product.series}
                   brand={product.brand || 'Unknown'} 
                   price={product.price}
                   pricePhp={product.price_php}

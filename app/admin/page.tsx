@@ -9,6 +9,7 @@ import AdminInventory from '@/app/components/AdminInventory';
 import AdminOrders from '@/app/components/AdminOrders';
 import AdminRequests from '@/app/components/AdminRequests';
 import AdminSettings from '../components/AdminSettings';
+import AdminCMS from '../components/AdminCMS';
 
 // Placeholder Component
 const ComingSoon = ({ title }: { title: string }) => (
@@ -209,12 +210,8 @@ export default function AdminPage() {
           {activeTab === 'orders' && <div className="p-10"><AdminOrders /></div>}
           {activeTab === 'requests' && <div className="p-10"><AdminRequests /></div>}
           
-          {activeTab === 'cms' && <ComingSoon title="WEBSITE EDITOR" />}
-          {activeTab === 'settings' && (
-            <div className="p-10">
-              <AdminSettings />
-            </div>
-          )}
+          {activeTab === 'cms' && (<div className="p-10"><AdminCMS /></div>)}
+          {activeTab === 'settings' && ( <div className="p-10"><AdminSettings /></div>)}
 
         </div>
       </main>
