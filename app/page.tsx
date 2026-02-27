@@ -85,21 +85,24 @@ export default async function Home() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+           <div className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory scrollbar-hide -mx-6 px-6 md:mx-0 md:px-0">
               {featuredProducts.map((product) => (
-                <ProductCard 
-                  key={product.id}
-                  id={product.id}
-                  name={product.name}
-                  series={product.series}
-                  brand={product.brand || 'Unknown'} 
-                  price={product.price}
-                  pricePhp={product.price_php}
-                  condition={product.condition}
-                  imageUrl={product.image_url || '/logo.png'}
-                  status={product.status}
-                  is_negotiable={product.is_negotiable}
-                />
+                // Bungkus ProductCard dengan div biar ukurannya tetap
+                <div key={product.id} className="min-w-[280px] md:min-w-[300px] snap-center">
+                  <ProductCard 
+                    key={product.id}
+                    id={product.id}
+                    name={product.name}
+                    series={product.series}
+                    brand={product.brand || 'Unknown'} 
+                    price={product.price}
+                    pricePhp={product.price_php}
+                    condition={product.condition}
+                    imageUrl={product.image_url || '/logo.png'}
+                    status={product.status}
+                    is_negotiable={product.is_negotiable}
+                  />
+                </div>
               ))}
             </div>
           </div>

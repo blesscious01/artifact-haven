@@ -1,29 +1,64 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { Menu, X } from 'lucide-react'; // Butuh install lucide-react kalo belum
+import { useState } from 'react';
 
 export default function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navLinks = [
+    { name: 'Home', href: '/' },
+    { name: 'Collection', href: '/collection' }, // Pastikan ada page ini, atau arahkan ke /#collection
+    { name: 'How to Buy', href: '/how-to-buy' },
+    { name: 'About', href: '/about' },
+  ];
+
   return (
-    <header className="fixed w-full top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md z-50 border-b border-gray-100">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+        
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center text-white font-black text-xs group-hover:rotate-12 transition-transform">
-            AH
-          </div>
-          <span className="font-black tracking-tighter text-lg">ARTIFACT HAVEN</span>
+        <Link href="/" className="text-xl font-black tracking-widest flex items-center gap-2">
+          ARTIFACT<span className="text-cyan-600">HAVEN</span>
         </Link>
 
-        {/* NAVIGASI TENGAH */}
-        <nav className="hidden md:flex items-center gap-8 text-sm font-bold text-gray-500">
-          <Link href="/" className="hover:text-black transition-colors">HOME</Link>
-          <Link href="/about" className="hover:text-black transition-colors">ABOUT US</Link>
-          <Link href="/collection" className="hover:text-black transition-colors">COLLECTION</Link>
+        {/* DESKTOP NAV */}
+        <nav className="hidden md:flex gap-8">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              className={`text-sm font-bold uppercase tracking-wider hover:text-cyan-600 transition-colors ${pathname === link.href ? 'text-black' : 'text-gray-400'}`}
+            >
+              {link.name}
+            </Link>
+          ))}
         </nav>
 
-        {/* TOMBOL REQUEST (Ganti tombol Admin jadi Request supaya lebih berguna) */}
-        <Link href="/#request" className="bg-black text-white px-5 py-2 rounded-full text-xs font-bold hover:bg-gray-800 transition-colors">
-          REQUEST FINDER
-        </Link>
+        {/* MOBILE MENU BUTTON */}
+        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 text-black">
+          {isOpen ? <X /> : <Menu />}
+        </button>
       </div>
+
+      {/* MOBILE NAV OVERLAY */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 shadow-xl p-6 flex flex-col gap-4">
+          {navLinks.map((link) => (
+            <Link 
+              key={link.name} 
+              href={link.href}
+              onClick={() => setIsOpen(false)}
+              className="text-lg font-bold text-gray-800 py-2 border-b border-gray-50"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+      )}
     </header>
   );
 }
